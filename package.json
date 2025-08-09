@@ -11,7 +11,8 @@
     "dev": "env-cmd -f .env nodemon",
     "build": "npm run clean && tsc",
     "test": "env-cmd -f .env jest --config=jest.json",
-    "lint": "eslint -c .eslintrc.js --ext .ts 'src/**/*.ts'"
+    "lint": "eslint -c .eslintrc.js --ext .ts 'src/**/*.ts'",
+    "seed": "ts-node --transpile-only prisma/seed.ts"
   },
   "dependencies": {
     "@fastify/helmet": "^11.1.1",
@@ -31,6 +32,7 @@
     "winston": "^3.11.0"
   },
   "devDependencies": {
+    "@faker-js/faker": "^9.9.0",
     "@types/jest": "^29.5.11",
     "@types/jsonwebtoken": "^9.0.5",
     "@types/node": "^20.0.0",

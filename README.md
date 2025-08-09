@@ -28,7 +28,7 @@ Required keys:
 
 ```
 npm ci
-# npx prisma migrate dev --name init (if you are using a new/local database)
+# npx prisma migrate deploy (if you are using a new/local database)
 npx prisma generate
 ```
 
