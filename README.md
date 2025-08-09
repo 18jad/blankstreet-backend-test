@@ -48,7 +48,7 @@ Swagger is at http://localhost:3000/docs. API routes are prefixed (default /api/
 
 ### 4) Auth and roles
 
-- Generate tokens in Swagger:
+- Since we don't have a real authentication system in place, the tokens are generated using Swagger for testing purposes. To generate the tokens:
   - POST /api/v1/auth/admin-token → ADMIN token
   - POST /api/v1/auth/customer-token → CUSTOMER token
 - Click “Authorize” in Swagger and paste: `<token>`
