@@ -2,6 +2,12 @@
 
 NestJS + Fastify API with Prisma, Swagger, Joi validation, and role based access (ADMIN, CUSTOMER).
 
+### Docs and endpoints demo images:
+<img width="2340" height="1287" alt="image" src="https://github.com/user-attachments/assets/37c30d65-1ee0-4f12-b369-175f86f3d1e0" />
+<img width="2389" height="1204" alt="image" src="https://github.com/user-attachments/assets/a9cb90c1-5ea3-4b92-ae3c-ecd75d1d2691" />
+
+
+
 ### Requirements
 
 - Node.js >= 20
