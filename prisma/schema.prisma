@@ -1,0 +1,120 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum OrderStatus {
+  PENDING
+  PAID
+  CANCELLED
+  REFUNDED
+}
+
+model Customer {
+  id        Int      @id @default(autoincrement())
+  name      String
+  email     String?  @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  orders Order[]
+
+  @@index([createdAt])
+}
+
+model Location {
+  id           Int      @id @default(autoincrement())
+  name         String
+  timezone     String   @default("UTC")
+  /// ISO 4217 3-letter currency code (e.g., "USD"). Amounts stored in minor units (cents).
+  /// Stored as String for flexibility; validate against an allowlist in the application layer.
+  currencyCode String   @db.VarChar(3)
+  /// Tax rate in basis points (e.g., 1000 = 10.00%)
+  taxRateBps   Int      @default(0)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  orders Order[]
+
+  @@index([currencyCode])
+}
+
+model Product {
+  id             Int      @id @default(autoincrement())
+  sku            String?  @unique
+  name           String
+  basePriceCents Int // price in minor units for default price list
+  /// ISO 4217 3-letter currency code (e.g., "USD"). Amounts stored in minor units (cents).
+  /// Stored as String for flexibility; validate against an allowlist in the application layer.
+  currencyCode   String   @db.VarChar(3)
+  isTaxable      Boolean  @default(true)
+  isActive       Boolean  @default(true)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  orderItems OrderItem[]
+
+  @@index([isActive])
+}
+
+model Order {
+  id     BigInt      @id @default(autoincrement())
+  status OrderStatus @default(PENDING)
+
+  // Relations
+  customerId Int
+  customer   Customer @relation(fields: [customerId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+
+  locationId Int
+  location   Location @relation(fields: [locationId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+
+  // Monetary values stored in minor units (e.g., cents)
+  /// ISO 4217 3-letter currency code (e.g., "USD"). Amounts stored in minor units (cents).
+  /// Stored as String for flexibility; validate against an allowlist in the application layer.
+  currencyCode  String @db.VarChar(3)
+  subtotalCents Int // sum of item totals before discounts and taxes
+  discountCents Int    @default(0)
+  taxCents      Int    @default(0)
+  totalCents    Int // subtotal - discount + tax
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  items OrderItem[]
+
+  // Indexes to optimize common queries and sorting
+  @@index([customerId, createdAt])
+  @@index([locationId, createdAt])
+  @@index([status, createdAt])
+  @@index([createdAt])
+}
+
+model OrderItem {
+  id BigInt @id @default(autoincrement())
+
+  orderId BigInt
+  order   Order  @relation(fields: [orderId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+
+  productId Int
+  product   Product @relation(fields: [productId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+
+  quantity Int @default(1)
+
+  // Snapshot pricing at the time of purchase (minor units)
+  unitPriceCents  Int
+  taxCents        Int @default(0)
+  totalPriceCents Int // typically quantity * unitPriceCents + taxCents
+
+  createdAt DateTime @default(now())
+
+  @@index([orderId])
+  @@index([productId])
+  @@index([productId, orderId])
+}
